@@ -7,27 +7,65 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class App
 {
+    /**
+     * @var Router
+     */
+    private $router;
 
-	/**
-	 * Description
-	 * @return type
-	 */
-	public function run(ServerRequestInterface $request): ResponseInterface {
-		$uri = $request->getUri()->getPath();
-		//si l'uri se termine par un slash...
-		if (!empty($uri) && $uri[-1] === "/") {
-			//on effectue une redirection vers une uri sans slash
-			return (new Response())
-				->withStatus(301)
-				->withHeader('Location: ', substr($uri, 0, -1))
-			;
-		}
+    /**
+     * @var Modules[] list of modules
+     */
+    private $modules = [];
 
-		if ($uri === '/blog') {
-			return new Response(200, [], '<h1>Bienvenue sur le blog</h1>');
-		}
-		//sinon on affiche simplement bonjour
-		$response = new Response(404, [], '<h1>Erreur 404</h1>');
-		return $response;
-	}
+    /**
+     * App constructor.
+     * @param string[] $modules liste des modules à charger
+    */
+    public function __construct(array $modules = [])
+    {
+        $this->router = new Router();
+        foreach ($modules as $module) {
+            $this->modules[] = new $module($this->router);
+        }
+    }
+
+    /**
+     * Description
+     * @param $object requête implementant ServerRequestInterface
+     * @return $object réponse renvoyée à la sutie de la requête
+     */
+    public function run(ServerRequestInterface $request): ResponseInterface
+    {
+        $uri = $request->getUri()->getPath();
+        //si l'uri se termine par un slash...
+        if (!empty($uri) && $uri[-1] === "/") {
+            //on effectue une redirection vers une uri sans slash
+            return (new Response())
+                ->withStatus(301)
+                ->withHeader('Location: ', substr($uri, 0, -1))
+            ;
+        }
+        //on récupère la route associée à la requête
+        $route = $this->router->match($request);
+
+        if (is_null($route)) {
+            return new Response(404, [], '<h1>Erreur 404</h1>');
+        }
+
+        $params = $route->getParams();
+        //ajout des paramètres à la requete
+        $request = array_reduce(array_keys($params), function ($request, $key) use ($params) {
+            return $request->withAttribute($key, $params[$key]);
+        }, $request);
+        //la route ayant été trouvé, on récupère la réponse à l'aide de la callback de la route, en lui passante la requête en paramètre
+        $response = call_user_func_array($route->getCallback(), [$request]);
+
+        if (is_string($response)) {
+            return new Response(200, [], $response);
+        } elseif ($response instanceof  ResponseInterface) {
+            return $response;
+        } else {
+            throw new \Exception('The reponse is not a string or an instance of ResponseInterface');
+        }
+    }
 }

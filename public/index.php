@@ -1,8 +1,9 @@
 <?php
 require '../vendor/autoload.php';
 
-
-$app = new \Framework\App;
+$app = new \Framework\App([
+    \App\Blog\BlogModule::class
+]);
 
 //la méthode fromGlobals de Guzzle génère automatiquement la requête
 // var_dump(\GuzzleHttp\Psr7\ServerRequest::fromGlobals());
@@ -11,4 +12,3 @@ $response = $app->run(\GuzzleHttp\Psr7\ServerRequest::fromGlobals());
 // var_dump($response->getHeader('Location: '));
 
 \Http\Response\send($response);
-
