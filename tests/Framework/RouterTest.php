@@ -34,7 +34,7 @@ class RouterTest extends TestCase
 	public function testGetMethodIfURLDoesNotExists()
 	{
 		$request = new ServerRequest('GET', '/blog');
-		$this->router->get('/blogaze', function () { return 'hello'; }, 'blog');
+		$this->router->get('/wrongUrl', function () { return 'hello'; }, 'blog');
 		$route = $this->router->match($request);
 		$this->assertEquals(null, $route);
 	}

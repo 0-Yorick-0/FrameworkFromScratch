@@ -2,10 +2,11 @@
 
 namespace Framework;
 
-use Framework\Router\Route;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Expressive\Router\FastRouteRouter;
 use Zend\Expressive\Router\Route as ZendRoute;
+
+use Framework\Router\Route;
 
 /**
  * Register and match routes
@@ -24,6 +25,7 @@ class Router
 
     
     /**
+     * Ajoute une route au router
      * @param string $path
      * @param callable $callable
      * @param string $name

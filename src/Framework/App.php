@@ -57,7 +57,7 @@ class App
         $request = array_reduce(array_keys($params), function ($request, $key) use ($params) {
             return $request->withAttribute($key, $params[$key]);
         }, $request);
-        //la route ayant été trouvé, on récupère la réponse à l'aide de la callback de la route, en lui passante la requête en paramètre
+        //la route ayant été trouvé, on récupère la réponse à l'aide de la callback de la route, en lui passant la requête en paramètre
         $response = call_user_func_array($route->getCallback(), [$request]);
 
         if (is_string($response)) {

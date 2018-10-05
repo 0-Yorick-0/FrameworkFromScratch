@@ -2,11 +2,13 @@
 
 <ruleset name="MonFramework">
 	<arg name="colors"/>
+	<!-- barre de progression -->
 	<arg value="p"/>
-
+	<!-- liste des dossier et/ou fichier à scanner -->
 	<file>src</file>
 	<file>public/index.php</file>
 
 	<rule ref="PSR2"></rule>
+	<!-- empêche d'écrire array() -->
 	<rule ref="Generic.Arrays.DisallowLongArraySyntax"></rule>
 </ruleset>
